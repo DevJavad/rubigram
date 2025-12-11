@@ -217,8 +217,8 @@ async def file_filter(_, client, update: Union["Update", "InlineMessage"]) -> bo
             await update.reply(text="Received a file!")
     """
     if isinstance(update, Update):
-        message = update.new_message
-        return hasattr(message, "file")
+        if update.new_message and update.new_message.file:
+            return True
     return False
 
 file = create(file_filter)
@@ -248,8 +248,8 @@ async def live_filter(_, client, update: Union["Update", "InlineMessage"]) -> bo
             await update.reply(text"Received a live location!")
     """
     if isinstance(update, Update):
-        message = update.new_message
-        return hasattr(message, "live_location")
+        if update.new_message and update.new_message.live_location:
+            return True
     return False
 
 live = create(live_filter)
@@ -279,8 +279,8 @@ async def poll_filter(_, client, update: Union["Update", "InlineMessage"]) -> bo
             await update.reply(text="Received a poll!")
     """
     if isinstance(update, Update):
-        message = update.new_message
-        return hasattr(message, "poll")
+        if update.new_message and update.new_message.poll:
+            return True
     return False
 
 poll = create(poll_filter)
@@ -311,8 +311,8 @@ async def contact_filter(_, client, update: Union["Update", "InlineMessage"]) ->
             await update.reply(text="You sent a contact!")
     """
     if isinstance(update, Update):
-        message = update.new_message
-        return hasattr(message, "contact_message")
+        if update.new_message and update.new_message.contact_message:
+            return True
     return False
 
 contact = create(contact_filter)
@@ -343,8 +343,8 @@ async def sticker_filter(_, client, update: Union["Update", "InlineMessage"]) ->
             await update.reply(text="You sent a sticker!")
     """
     if isinstance(update, Update):
-        message = update.new_message
-        return hasattr(message, "sticker")
+        if update.new_message and update.new_message.sticker:
+            return True
     return False
 
 sticker = create(sticker_filter)
@@ -375,8 +375,8 @@ async def location_filter(_, client, update: Union["Update", "InlineMessage"]) -
             await update.reply(text="You shared a location!")
     """
     if isinstance(update, Update):
-        message = update.new_message
-        return hasattr(message, "location")
+        if update.new_message and update.new_message.location:
+            return True
     return False
 
 location = create(location_filter)
@@ -407,8 +407,8 @@ async def forward_filter(_, client, update: Union["Update", "InlineMessage"]) ->
             await update.reply(text="This message was forwarded!")
     """
     if isinstance(update, Update):
-        message = update.new_message
-        return hasattr(message, "forwarded_from")
+        if update.new_message and update.new_message.forwarded_from:
+            return True
     return False
 
 forward = create(forward_filter)
@@ -874,3 +874,51 @@ def state(
         prefix=prefix,
         case_sensitive=case_sensitive
     )
+    
+
+async def photo_filter(_, client, update: "Update") -> bool:
+    if update.new_message and update.new_message.file:
+        return update.new_message.file.file_type == "Image"
+    return False
+
+photo = create(photo_filter)
+
+
+async def video_filter(_, client, update: "Update") -> bool:
+    if update.new_message and update.new_message.file:
+        return update.new_message.file.file_type == "Video"
+    return False
+
+video = create(video_filter)
+
+
+async def gif_filter(_, client, update: "Update") -> bool:
+    if update.new_message and update.new_message.file:
+        return update.new_message.file.file_type == "Gif"
+    return False
+
+gif = create(gif_filter)
+
+
+async def music_filter(_, client, update: "Update") -> bool:
+    if update.new_message and update.new_message.file:
+        return update.new_message.file.file_type == "Music"
+    return False
+
+music = create(music_filter)
+
+
+async def voice_filter(_, client, update: "Update") -> bool:
+    if update.new_message and update.new_message.file:
+        return update.new_message.file.file_type == "Voice"
+    return False
+
+voice = create(voice_filter)
+
+
+async def document_filter(_, client, update: "Update") -> bool:
+    if update.new_message and update.new_message.file:
+        return update.new_message.file.file_type == "File"
+    return False
+
+document = create(document_filter)
