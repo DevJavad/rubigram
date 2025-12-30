@@ -1,0 +1,22 @@
+[project]
+name = "RubigramClient"
+version = "1.7.20"
+description = "A simple and flexible Python library for building advanced Rubika bots with powerful message handling, inline buttons, and custom filters."
+readme = "README.md"
+requires-python = ">=3.4"
+license = {file = "LICENSE"}
+authors = [
+  { name="Javad", email="MrJavad.Email@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "aiohttp",
+    "aiofiles",
+    "aiocache"
+]
+
+urls = { "GitHub" = "https://github.com/DevJavad/rubigram" }
