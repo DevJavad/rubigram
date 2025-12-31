@@ -4,7 +4,15 @@
 
 
 from .get_chat import GetChat
+from .get_chat_member import GetChatMember
+from .ban_chat_member import BanChatMember
+from .unban_chat_member import UnbanChatMember
 
 
-class Chats(GetChat):
+class Chats(
+    GetChat,
+    GetChatMember,
+    BanChatMember,
+    UnbanChatMember
+):
     pass
