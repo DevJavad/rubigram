@@ -50,7 +50,7 @@ class Request:
             )
 
         for attempt in range(1, retries + 1):
-            logger.info(
+            logger.debug(
                 "Request attempt %s/%s for method '%s' | timeout=%s",
                 attempt, retries, method, self.http.session.timeout.total
             )
@@ -58,7 +58,6 @@ class Request:
                 async with self.http.session.post(self.api + method, **kwargs) as response:
                     response.raise_for_status()
                     data: dict = await response.json()
-
                     if data.get("status") == "OK":
                         return data.get("data")
 

@@ -166,7 +166,7 @@ class Client(Methods):
             - Automatically called by context manager and run() method
             - Start handlers can be used for initialization tasks
             - HTTP session is created with configured timeouts and limits
-    """
+        """
         await self.http.connect()
         for app in self.start_handlers:
             try:
@@ -187,7 +187,7 @@ class Client(Methods):
             - Automatically called by context manager and on shutdown
             - Stop handlers can be used for cleanup tasks
             - Ensures proper resource release
-    """
+        """
         await self.http.disconnect()
         for app in self.stop_handlers:
             try:

@@ -58,35 +58,9 @@ class Server:
         self.app = Application()
         self.routes = RouteTableDef()
 
-        self.app.on_startup.append(self.startup)
-        self.app.on_cleanup.append(self.cleanup)
-
         self.runner = None
         self.site = None
 
-    async def startup(self, app):
-        """
-        Server startup handler.
-
-        Called when the aiohttp application starts.
-        Initializes the bot client.
-
-        Parameters:
-            app: aiohttp Application instance.
-        """
-        await self.client.start()
-
-    async def cleanup(self, app):
-        """
-        Server cleanup handler.
-
-        Called when the aiohttp application stops.
-        Shuts down the bot client.
-
-        Parameters:
-            app: aiohttp Application instance.
-        """
-        await self.client.stop()
 
     async def setup(self):
         """
@@ -181,6 +155,7 @@ class Server:
         self.app.add_routes(self.routes)
 
     async def start(self):
+        await self.client.start()
         await self.setup()
         self.setup_routes()
         self.runner = AppRunner(self.app)
@@ -189,17 +164,23 @@ class Server:
         await self.site.start()
 
     async def stop(self):
-        if self.runner:
-            await self.runner.cleanup()
+        await self.client.stop()
+        await self.runner.cleanup()
 
     async def run(self):
         await self.start()
+        logger.info(
+            "Start Server | url=%s | host=%s | port=%s", self.url, self.host, self.port
+        )
         try:
             await asyncio.Event().wait()
         except asyncio.CancelledError:
             pass
         finally:
             await self.stop()
+            logger.info(
+                "Shutdown Server | url=%s | host=%s | port=%s", self.url, self.host, self.port
+            )
 
     def run_server(self):
         """
@@ -212,13 +193,7 @@ class Server:
             server = Server(client, "https://example.com")
             server.run_server()  # Blocks here until Ctrl+C
         """
-
         try:
-            logger.info(
-                "Start Server | url=%s | host=%s | port=%s", self.url, self.host, self.port
-            )
             asyncio.run(self.run())
         except KeyboardInterrupt:
-            logger.info(
-                "Shutdown Server | url=%s | host=%s | port=%s", self.url, self.host, self.port
-            )
+            pass

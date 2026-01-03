@@ -8,7 +8,7 @@
   <a href="https://pypi.org/project/RubigramClient">
     <img src="https://img.shields.io/pypi/v/RubigramClient?style=flat-square" alt="PyPI">
   </a>
-  <a href="http://rubigram.ir/docs">
+  <a href="http://rubigram.ir/doc">
     <img src="https://img.shields.io/badge/docs-online-blue?style=flat-square" alt="Documentation">
   </a>
 </p>

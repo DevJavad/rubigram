@@ -7,7 +7,20 @@ from __future__ import annotations
 
 from collections import defaultdict
 from typing import DefaultDict, List, Union
+import asyncio
 import rubigram
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+HANDLER_TYPES: dict = {
+    "NewMessage": rubigram.enums.HandlerType.MESSAGE,
+    "UpdatedMessage": rubigram.enums.HandlerType.EDITED,
+    "RemovedMessage": rubigram.enums.HandlerType.DELETED,
+    "StartedBot": rubigram.enums.HandlerType.START_BOT,
+    "StoppedBot": rubigram.enums.HandlerType.STOP_BOT
+}
 
 
 class Dispatcher:
@@ -116,21 +129,8 @@ class Dispatcher:
 
         if isinstance(update, rubigram.types.InlineMessage):
             event_type = rubigram.enums.HandlerType.INLINE
-        else:
-            if update.type == "NewMessage":
-                event_type = rubigram.enums.HandlerType.MESSAGE
-
-            elif update.type == "UpdatedMessage":
-                event_type = rubigram.enums.HandlerType.EDITED
-
-            elif update.type == "RemovedMessage":
-                event_type = rubigram.enums.HandlerType.DELETED
-
-            elif update.type == "StartedBot":
-                event_type = rubigram.enums.HandlerType.START_BOT
-
-            elif update.type == "StoppedBot":
-                event_type = rubigram.enums.HandlerType.STOP_BOT
+        
+        event_type = HANDLER_TYPES.get(update.type)
 
         groups = self.handlers.get(event_type)
         if not groups:
@@ -140,8 +140,9 @@ class Dispatcher:
             for handler in groups[group]:
                 try:
                     if await handler.check(self.client, update):
-                        await handler.run(self.client, update)
+                        asyncio.create_task(handler.run(self.client, update))
+                        break
                 except rubigram.StopPropagation:
-                    break
+                    raise
                 except rubigram.ContinuePropagation:
                     continue
