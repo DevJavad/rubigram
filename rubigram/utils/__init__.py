@@ -4,11 +4,4 @@
 
 
 from .auto_delete import AutoDelete
-from .parser import Parser
-
-
-class Utils(
-    AutoDelete,
-    Parser
-):
-    pass
+from .utils import clean_payload
