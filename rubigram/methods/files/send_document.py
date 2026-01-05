@@ -9,14 +9,14 @@ from typing import Optional, Union, BinaryIO
 import rubigram
 
 
-class SendMusic:
+class SendDocument:
 
     __slots__ = ()
 
-    async def send_music(
+    async def send_document(
         self: rubigram.Client,
         chat_id: str,
-        music: Union[str, bytes, BinaryIO],
+        document: Union[str, bytes, BinaryIO],
         caption: Optional[str] = None,
         filename: Optional[str] = None,
         chat_keypad: Optional[rubigram.types.Keypad] = None,
@@ -24,6 +24,7 @@ class SendMusic:
         chat_keypad_type: Optional[rubigram.enums.ChatKeypadType] = None,
         disable_notification: bool = False,
         reply_to_message_id: Optional[str] = None,
+        metadata: Optional[rubigram.types.Metadata] = None,
         parse_mode: Optional[Union[str, rubigram.enums.ParseMode]] = None,
         auto_delete: Optional[int] = None,
         headers: Optional[dict] = None,
@@ -37,29 +38,29 @@ class SendMusic:
         read_timeout: Optional[float] = None
     ) -> rubigram.types.UMessage:
         """
-        Send a music file to a chat on Rubika.
+        Send a document file to a chat on Rubika.
 
         This is a convenience wrapper around :meth:`send_file` specifically for sending
-        music/audio files. Supports the same parameters as `send_file` including captions, keyboards,
+        document files. Supports the same parameters as `send_file` including captions, keyboards,
         message parsing, auto-delete, and notification options.
 
-        Note: Uses `FileType.FILE` for music files. Ensure the file format is supported by Rubika.
+        Note: Uses `FileType.FILE` for document files. Ensure the file format is supported by Rubika.
 
         Parameters:
             chat_id (str):
-                The target chat ID where the music will be sent.
+                The target chat ID where the document will be sent.
 
-            music (Union[str, bytes, BinaryIO]):
-                The music file to send. Can be:
+            document (Union[str, bytes, BinaryIO]):
+                The document file to send. Can be:
                 - Local file path (str)
                 - HTTP/HTTPS URL (str)
                 - Bytes or BinaryIO stream
 
             caption (Optional[str], default: None):
-                Text caption for the music file.
+                Text caption for the document file.
 
             filename (Optional[str], default: None):
-                Custom filename for the uploaded music file.
+                Custom filename for the uploaded document file.
 
             chat_keypad (Optional[rubigram.types.Keypad], default: None):
                 Keypad to attach to the chat message.
@@ -111,37 +112,37 @@ class SendMusic:
 
         Returns:
             rubigram.types.UMessage:
-                The message object representing the sent music file.
+                The message object representing the sent document file.
 
         Example:
         .. code-block:: python
-            # Send music from local file
-            message = await client.send_music(
+            # Send document from local file
+            message = await client.send_document(
                 chat_id="123456",
-                music="path/to/song.mp3",
+                document="path/to/document.pdf",
                 caption="Listen to this track!",
                 auto_delete=120
             )
 
-            # Send music from URL
-            message = await client.send_music(
+            # Send document from URL
+            message = await client.send_document(
                 chat_id="789012",
-                music="https://example.com/song.mp3",
-                caption="Music from the web"
+                document="https://example.com/document.pdf",
+                caption="document from the web"
             )
 
-            # Send music as bytes
-            with open("song.mp3", "rb") as f:
-                music_bytes = f.read()
-            message = await client.send_music(
+            # Send document as bytes
+            with open("fdocument.pdf", "rb") as f:
+                document_bytes = f.read()
+            message = await client.send_document(
                 chat_id="345678",
-                music=music_bytes,
-                filename="custom_name.mp3"
+                document=document_bytes,
+                filename="custom_name.pdf"
             )
         """
         return await self.send_file(
             chat_id,
-            music,
+            document,
             caption,
             filename,
             rubigram.enums.FileType.FILE,
@@ -150,6 +151,7 @@ class SendMusic:
             chat_keypad_type,
             disable_notification,
             reply_to_message_id,
+            metadata,
             parse_mode,
             auto_delete,
             headers,

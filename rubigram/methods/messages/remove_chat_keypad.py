@@ -70,7 +70,7 @@ class RemoveChatKeypad:
             result = await client.remove_chat_keypad(
                 chat_id="123456"
             )
-            
+
             print(f"Chat keypad removed successfully: {result}")
 
         Note:
@@ -81,17 +81,6 @@ class RemoveChatKeypad:
         """
         return await self.request(
             "editChatKeypad",
-            {
-                "chat_id": chat_id,
-                "chat_keypad_type": "Remove"
-            },
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            {"chat_id": chat_id, "chat_keypad_type": "Remove"},
+            headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )

@@ -5,9 +5,10 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union, BinaryIO
 from pathlib import Path
-from rubigram.utils import AutoDelete, Parser
+from rubigram.parser import Parser
+from typing import Optional, Union, BinaryIO
+from rubigram.utils import AutoDelete, clean_payload
 import rubigram
 
 
@@ -27,6 +28,7 @@ class SendFile:
         chat_keypad_type: Optional[rubigram.enums.ChatKeypadType] = None,
         disable_notification: bool = False,
         reply_to_message_id: Optional[str] = None,
+        metadata: Optional[rubigram.types.Metadata] = None,
         parse_mode: Optional[Union[str, rubigram.enums.ParseMode]] = None,
         auto_delete: Optional[int] = None,
         headers: Optional[dict] = None,
@@ -129,14 +131,8 @@ class SendFile:
                 auto_delete=60
             )
         """
-
-        if not chat_id:
-            raise ValueError("chat_id is required")
-
         if not isinstance(file, (str, bytes)) and not hasattr(file, "read"):
             raise TypeError("file must be str, bytes, or BinaryIO")
-
-        type = type if isinstance(type, str) else type.value
 
         upload_url = await self.request_send_file(type)
         if not upload_url:
@@ -149,7 +145,7 @@ class SendFile:
                 source = file
 
             elif Path(file).exists():
-                source = Path(file)
+                source = file
 
             else:
                 download_url = await self.get_file(file)
@@ -160,68 +156,38 @@ class SendFile:
             source = file
 
         file_id = await self.upload_file(
-            upload_url,
-            source,
-            filename,
-            headers,
-            proxy,
-            timeout,
-            connect_timeout,
-            read_timeout
+            upload_url, source, filename, headers, proxy, timeout, connect_timeout, read_timeout
         )
 
         if not file_id:
             raise RuntimeError("Upload succeeded but file_id is missing")
 
-        data = {
-            "chat_id": chat_id,
-            "file_id": file_id
-        }
-
-        if caption:
-            parsed = Parser.parser(caption, parse_mode or self.parse_mode)
-            data["text"] = parsed.get("text", caption)
-            if "metadata" in parsed:
-                data["metadata"] = parsed["metadata"]
-
-        if chat_keypad:
-            data["chat_keypad"] = chat_keypad.as_dict()
-
-        if inline_keypad:
-            data["inline_keypad"] = inline_keypad.as_dict()
-
-        if chat_keypad_type:
-            data["chat_keypad_type"] = (
-                chat_keypad_type.value
-                if hasattr(chat_keypad_type, "value")
-                else chat_keypad_type
+        if metadata is None and caption:
+            caption, metadata = Parser.parse(
+                caption, parse_mode or self.parse_mode
             )
 
-        if disable_notification:
-            data["disable_notification"] = True
-
-        if reply_to_message_id:
-            data["reply_to_message_id"] = reply_to_message_id
+        data = clean_payload({
+            "chat_id": chat_id,
+            "file_id": file_id,
+            "text": caption,
+            "metadata": metadata,
+            "chat_keypad": chat_keypad.as_dict() if chat_keypad else None,
+            "inline_keypad": inline_keypad.as_dict() if inline_keypad else None,
+            "chat_keypad_type": chat_keypad_type,
+            "disable_notification": disable_notification,
+            "reply_to_message_id": reply_to_message_id
+        })
 
         response = await self.request(
-            "sendFile",
-            data,
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            "sendFile", data, headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )
 
         message = rubigram.types.UMessage.parse(response, self)
         message.chat_id = chat_id
         message.file_id = file_id
 
-        if auto_delete and auto_delete > 0:
+        if (auto_delete := auto_delete or self.auto_delete) and auto_delete > 0:
             AutoDelete.run(self, message, auto_delete)
 
         return message

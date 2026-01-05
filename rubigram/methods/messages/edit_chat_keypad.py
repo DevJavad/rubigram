@@ -78,7 +78,7 @@ class EditChatKeypad:
         .. code-block:: python
             # Create a new keypad
             from rubigram import types
-            
+
             keypad = types.Keypad(
                 rows=[
                     [
@@ -102,13 +102,13 @@ class EditChatKeypad:
                     ]
                 ]
             )
-            
+
             # Edit the chat keypad
             result = await client.edit_chat_keypad(
                 chat_id="123456",
                 chat_keypad=keypad
             )
-            
+
             print(f"Keypad updated successfully: {result}")
 
         Note:
@@ -117,11 +117,6 @@ class EditChatKeypad:
             - The keypad will be visible to all users in the chat
             - Use `chat_keypad.as_dict()` to serialize the keypad object
         """
-        if not chat_id:
-            raise ValueError("Parameter 'chat_id' must be a non-empty string")
-        if not chat_keypad:
-            raise ValueError("Parameter 'chat_keypad' must be a non-empty string")
-        
         return await self.request(
             "editChatKeypad",
             {
@@ -129,13 +124,5 @@ class EditChatKeypad:
                 "chat_keypad_type": "New",
                 "chat_keypad": chat_keypad.as_dict()
             },
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )

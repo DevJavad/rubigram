@@ -34,6 +34,5 @@ class RequestSendFile:
         .. code-block:: python
             upload_url = await client.request_send_file(type=rubigram.enums.FileType.FILE)
         """
-        type = type if isinstance(type, str) else type.value
         response = await self.request("requestSendFile", {"type": type})
         return response["upload_url"]

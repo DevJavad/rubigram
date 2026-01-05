@@ -31,11 +31,8 @@ class Request:
         max_delay: Optional[float] = None,
         timeout: Optional[float] = None,
         connect_timeout: Optional[float] = None,
-        read_timeout: Optional[float] = None,
+        read_timeout: Optional[float] = None
     ) -> dict:
-        if not method:
-            raise ValueError("Parameter 'method' must be a non-empty string")
-
         proxy = proxy or self.proxy
         retries = retries or self.retries
         delay = delay or self.delay

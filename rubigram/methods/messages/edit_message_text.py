@@ -6,7 +6,8 @@
 from __future__ import annotations
 
 from typing import Optional, Union
-from rubigram.utils import Parser
+from rubigram.parser import Parser
+from rubigram.utils import clean_payload
 import rubigram
 
 
@@ -93,7 +94,7 @@ class EditMessageText:
                 message_id="msg_789",
                 text="This is the updated message text"
             )
-            
+
             # Edit message with formatted text
             result = await client.edit_message_text(
                 chat_id="123456",
@@ -101,10 +102,10 @@ class EditMessageText:
                 text="*Bold text* and _italic text_",
                 parse_mode="Markdown"
             )
-            
+
             # Edit message using enum for parse_mode
             from rubigram.enums import ParseMode
-            
+
             result = await client.edit_message_text(
                 chat_id="123456",
                 message_id="msg_789",
@@ -118,35 +119,14 @@ class EditMessageText:
             - The parser automatically extracts metadata for formatted text
             - If metadata is present in parsed text, it's included in the request
         """
-        if not chat_id:
-            raise ValueError("Parameter 'chat_id' must be a non-empty string")
-        if not message_id:
-            raise ValueError("Parameter 'message_id' must be a non-empty string")
-        if not text:
-            raise ValueError("Parameter 'text' must be a non-empty string")
-
-        data = {
+        text, metadata = Parser.parse(text, parse_mode or self.parse_mode)
+        data = clean_payload({
             "chat_id": chat_id,
             "message_id": message_id,
-            "text": text
-        }
-
-        parse = Parser.parser(text, parse_mode or self.parse_mode)
-
-        if "metadata" in parse:
-            data["text"] = parse["text"]
-            data["metadata"] = parse["metadata"]
+            "text": text,
+            "metadata": metadata
+        })
 
         return await self.request(
-            "editMessageText",
-            data,
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            "editMessageText", data, headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )

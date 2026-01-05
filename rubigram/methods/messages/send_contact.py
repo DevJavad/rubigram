@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from typing import Optional, Union
-from rubigram.utils import AutoDelete
+from rubigram.utils import AutoDelete, clean_payload
 import rubigram
 
 
@@ -19,7 +19,7 @@ class SendContact:
         last_name: Optional[str] = None,
         chat_keypad: Optional[rubigram.types.Keypad] = None,
         inline_keypad: Optional[rubigram.types.Keypad] = None,
-        chat_keypad_type: Optional[Union[str, rubigram.enums.ChatKeypadType]] = None,
+        chat_keypad_type: Union[str, rubigram.enums.ChatKeypadType] = None,
         disable_notification: bool = False,
         reply_to_message_id: Optional[str] = None,
         auto_delete: Optional[int] = None,
@@ -113,7 +113,7 @@ class SendContact:
                 first_name="John",
                 last_name="Doe"
             )
-            
+
             # Send a contact with reply and auto-deletion
             message = await client.send_contact(
                 chat_id="123456",
@@ -123,10 +123,10 @@ class SendContact:
                 reply_to_message_id="msg_789",
                 auto_delete=120  # Delete after 2 minutes
             )
-            
+
             # Send a contact silently with custom keypad
             from rubigram import types
-            
+
             keypad = types.Keypad(rows=[[types.Button(text="Call", action_type="Call")]])
             message = await client.send_contact(
                 chat_id="123456",
@@ -135,7 +135,7 @@ class SendContact:
                 disable_notification=True,
                 chat_keypad=keypad
             )
-            
+
             print(f"Contact sent with message ID: {message.message_id}")
 
         Note:
@@ -145,45 +145,25 @@ class SendContact:
             - The returned UMessage object has its `client` attribute set for future operations
             - Users can directly save the contact to their phone from the message
         """
-        data = {
+        data = clean_payload({
             "chat_id": chat_id,
             "first_name": first_name,
             "last_name": last_name,
-            "phone_number": phone_number
-        }
-
-        if chat_keypad:
-            data["chat_keypad"] = chat_keypad.as_dict()
-
-        if inline_keypad:
-            data["inline_keypad"] = inline_keypad.as_dict()
-
-        if chat_keypad_type:
-            data["chat_keypad_type"] = chat_keypad_type
-
-        if disable_notification:
-            data["disable_notification"] = disable_notification
-
-        if reply_to_message_id:
-            data["reply_to_message_id"] = reply_to_message_id
+            "phone_number": phone_number,
+            "chat_keypad": chat_keypad.as_dict() if chat_keypad else None,
+            "inline_keypad": inline_keypad.as_dict() if inline_keypad else None,
+            "chat_keypad_type": chat_keypad_type,
+            "disable_notification": disable_notification,
+            "reply_to_message_id": reply_to_message_id
+        })
 
         response = await self.request(
-            "sendContact",
-            data,
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            "sendContact",  data, headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )
         message = rubigram.types.UMessage.parse(response, self)
         message.client = self
 
-        if auto_delete and auto_delete > 0:
+        if (auto_delete := auto_delete or self.auto_delete) and auto_delete > 0:
             AutoDelete.run(self, message, auto_delete)
 
         return message

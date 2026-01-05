@@ -91,7 +91,7 @@ class ForwardMessage:
                 to_chat_id="destination_chat_789",
                 disable_notification=True
             )
-            
+
             # Forward with auto-deletion
             message = await client.forward_message(
                 from_chat_id="source_chat_123",
@@ -99,7 +99,7 @@ class ForwardMessage:
                 to_chat_id="destination_chat_789",
                 auto_delete=60  # Delete after 60 seconds
             )
-            
+
             print(f"Forwarded message ID: {message.message_id} to chat: {message.chat_id}")
 
         Note:
@@ -117,20 +117,12 @@ class ForwardMessage:
                 "to_chat_id": to_chat_id,
                 "disable_notification": disable_notification
             },
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )
         message = rubigram.types.UMessage.parse(response, self)
         message.chat_id = to_chat_id
 
-        if auto_delete and auto_delete > 0:
+        if (auto_delete := auto_delete or self.auto_delete) and auto_delete > 0:
             AutoDelete.run(self, message, auto_delete)
 
         return message

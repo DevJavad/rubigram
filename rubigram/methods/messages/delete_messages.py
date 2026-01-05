@@ -112,15 +112,7 @@ class DeleteMessage:
             self.request(
                 "deleteMessage",
                 {"chat_id": chat_id, "message_id": id},
-                headers,
-                proxy,
-                retries,
-                delay,
-                backoff,
-                max_delay,
-                timeout,
-                connect_timeout,
-                read_timeout
+                headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
             ) for id in ids
         ]
 

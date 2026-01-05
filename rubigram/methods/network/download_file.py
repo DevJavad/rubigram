@@ -136,9 +136,6 @@ class DownloadFile:
             - Uses client's HTTP session for connection pooling
             - In-memory mode is useful for processing files without disk I/O
         """
-        if not file_id:
-            raise ValueError("file_id is required")
-
         url = await self.get_file(file_id)
         if url is None:
             raise ValueError("Invalid file_id: %s", file_id)

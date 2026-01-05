@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from typing import Optional, Union
-from rubigram.utils import AutoDelete
+from rubigram.utils import AutoDelete, clean_payload
 import rubigram
 
 
@@ -17,7 +17,7 @@ class SendSticker:
         sticker_id: str,
         chat_keypad: Optional[rubigram.types.Keypad] = None,
         inline_keypad: Optional[rubigram.types.Keypad] = None,
-        chat_keypad_type: Optional[Union[str, rubigram.enums.ChatKeypadType]] = None,
+        chat_keypad_type: Union[str, rubigram.enums.ChatKeypadType] = None,
         disable_notification: bool = False,
         reply_to_message_id: Optional[str] = None,
         auto_delete: Optional[int] = None,
@@ -103,7 +103,7 @@ class SendSticker:
                 chat_id="123456",
                 sticker_id="sticker_1234567890"
             )
-            
+
             # Send a sticker with reply and auto-deletion
             message = await client.send_sticker(
                 chat_id="123456",
@@ -111,10 +111,10 @@ class SendSticker:
                 reply_to_message_id="msg_789",
                 auto_delete=90  # Delete after 1.5 minutes
             )
-            
+
             # Send a sticker silently with custom keypad
             from rubigram import types
-            
+
             keypad = types.Keypad(rows=[[
                 types.Button(
                     text="Send Another",
@@ -128,7 +128,7 @@ class SendSticker:
                 disable_notification=True,
                 inline_keypad=keypad
             )
-            
+
             print(f"Sticker sent with message ID: {message.message_id}")
 
         Note:
@@ -140,39 +140,23 @@ class SendSticker:
             - Useful for sending emotions, reactions, or decorative elements in chats
             - Stickers don't support captions or text content (only the sticker itself)
         """
-        data = {
+        data = clean_payload({
             "chat_id": chat_id,
-            "sticker_id": sticker_id
-        }
-
-        if chat_keypad:
-            data["chat_keypad"] = chat_keypad.as_dict()
-        if inline_keypad:
-            data["inline_keypad"] = inline_keypad.as_dict()
-        if chat_keypad_type:
-            data["chat_keypad_type"] = chat_keypad_type
-        if disable_notification:
-            data["disable_notification"] = disable_notification
-        if reply_to_message_id:
-            data["reply_to_message_id"] = reply_to_message_id
+            "sticker_id": sticker_id,
+            "chat_keypad": chat_keypad.as_dict() if chat_keypad else None,
+            "inline_keypad": inline_keypad.as_dict() if inline_keypad else None,
+            "chat_keypad_type": chat_keypad_type,
+            "disable_notification": disable_notification,
+            "reply_to_message_id": reply_to_message_id
+        })
 
         response = await self.request(
-            "sendSticker",
-            data,
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            "sendSticker", data, headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )
         message = rubigram.types.UMessage.parse(response, self)
         message.chat_id = chat_id
 
-        if auto_delete and auto_delete > 0:
+        if (auto_delete := auto_delete or self.auto_delete) and auto_delete > 0:
             AutoDelete.run(self, message, auto_delete)
 
         return message

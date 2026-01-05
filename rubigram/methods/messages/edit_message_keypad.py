@@ -83,7 +83,7 @@ class EditMessageKeypad:
         .. code-block:: python
             # Create a new inline keypad
             from rubigram import types
-            
+
             new_keypad = types.Keypad(
                 rows=[
                     [
@@ -102,14 +102,14 @@ class EditMessageKeypad:
                     ]
                 ]
             )
-            
+
             # Edit the message's inline keypad
             result = await client.edit_message_keypad(
                 chat_id="123456",
                 message_id="msg_789",
                 inline_keypad=new_keypad
             )
-            
+
             print(f"Message keypad updated successfully: {result}")
 
         Note:
@@ -118,13 +118,6 @@ class EditMessageKeypad:
             - Use `inline_keypad.as_dict()` to serialize the keypad object
             - This is useful for updating dynamic menus or button states
         """
-        if not chat_id:
-            raise ValueError("Parameter 'chat_id' must be a non-empty string")
-        if not message_id:
-            raise ValueError("Parameter 'message_id' must be a non-empty string")
-        if not inline_keypad:
-            raise ValueError("Parameter 'inline_keypad' must be a non-empty string")
-        
         return await self.request(
             "editMessageKeypad",
             {
@@ -132,13 +125,5 @@ class EditMessageKeypad:
                 "message_id": message_id,
                 "inline_keypad": inline_keypad.as_dict()
             },
-            headers,
-            proxy,
-            retries,
-            delay,
-            backoff,
-            max_delay,
-            timeout,
-            connect_timeout,
-            read_timeout
+            headers, proxy, retries, delay, backoff, max_delay, timeout, connect_timeout, read_timeout
         )
