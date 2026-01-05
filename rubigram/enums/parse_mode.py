@@ -16,5 +16,6 @@ class ParseMode(Enum):
         HTML (str): Parses the message as HTML.
     """
 
-    MARKDOWN = "markdown"
-    HTML = "html"
+    MARKDOWN = "Markdown"
+    HTML = "Html"
+    DISABLED = "Disable"
