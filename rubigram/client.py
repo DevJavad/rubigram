@@ -96,6 +96,7 @@ class Client(Methods):
         max_connections: int = 100,
         proxy: Optional[str] = None,
         parse_mode: Union[str, ParseMode] = ParseMode.MARKDOWN,
+        auto_delete: Optional[int] = None
     ):
         self.token = token
         self.offset_id = offset_id
@@ -110,6 +111,7 @@ class Client(Methods):
         self.max_connections = max_connections
         self.proxy = proxy
         self.parse_mode = parse_mode
+        self.auto_delete = auto_delete
 
         self.dispatcher = Dispatcher(self)
         self.http = HttpSession(

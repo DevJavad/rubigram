@@ -19,7 +19,7 @@ class ContinuePropagation(StopAsyncIteration):
     pass
 
 
-__version__ = "1.7.22"
+__version__ = "1.7.23"
 __author__ = "PyJavad"
 __github__ = "https://github.ocm/DevJavad/rubigram"
 __message__ = "Welcome to Rubigram Client\nYou are using version %s", __version__
