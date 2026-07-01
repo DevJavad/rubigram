@@ -35,8 +35,9 @@ class Client(Methods):
     DEVICE_MODEL: str = "Rubigram"
 
     WSS_URL: str = "wss://nsocket11.iranlms.ir:80"
-    API_URL: str = "https://messengerg2c%s.iranlms.ir/" % randint(1, 69)
-    API_URL = "https://messengerg2c23.iranlms.ir"
+    @property
+    def API_URL(self):
+        return "https://messengerg2c%s.iranlms.ir/" % randint(1, 69)
 
     WEB_USER_AGENT = (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
